@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Glee Trivia</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+        text-align: center;
+    }
+
+    iframe {
+        margin-top: 20px;
+        border: 4px solid #ff4081;
+        border-radius: 10px;
+    }
+
+    input {
+        padding: 10px;
+        margin: 5px;
+        width: 200px;
+        border-radius: 6px;
+        border: none;
+    }
+
+    button {
+        padding: 10px 15px;
+        margin-top: 10px;
+        background: #ff4081;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    #scores {
+        margin-top: 15px;
+        font-size: 18px;
+    }
+
+    #timer {
+        font-size: 24px;
+        margin-top: 10px;
+        color: #00e5ff;
+    }
+</style>
+</head>
+<body>
+
+<h1>🎤 Glee Trivia</h1>
+<div id="round">Round 1 / 8</div>
+<div id="timer">Time: 10</div>
+
+<iframe id="video" width="400" height="225" src="" allowfullscreen></iframe>
+
+<div>
+    <h3>Player 1</h3>
+    <input id="p1song" placeholder="Song Title">
+    <input id="p1artist" placeholder="Singer">
+</div>
+
+<div>
+    <h3>Player 2</h3>
+    <input id="p2song" placeholder="Song Title">
+    <input id="p2artist" placeholder="Singer">
+</div>
+
+<button onclick="submitAnswers()">Submit Answers</button>
+
+<div id="scores">
+    Player 1: 0 | Player 2: 0
+</div>
+
+<div id="result"></div>
+
+<script>
+const rounds = [
+    {
+        video: "https://www.youtube.com/embed/1HnOFwqpLRQ",
+        song: "Don't Stop Believin",
+        singer: "Rachel"
+    },
+    {
+        video: "https://www.youtube.com/embed/eYhY4lKX7xU",
+        song: "Valerie",
+        singer: "Santana"
+    },
+    {
+        video: "https://www.youtube.com/embed/6XvYx7Qy2ks",
+        song: "Teenage Dream",
+        singer: "Blaine"
+    },
+    {
+        video: "https://www.youtube.com/embed/Tm9y8Xc5RzY",
+        song: "Rumour Has It",
+        singer: "Mercedes"
+    },
+    {
+        video: "https://www.youtube.com/embed/Y0m9dGq4s7Q",
+        song: "Defying Gravity",
+        singer: "Kurt"
+    },
+    {
+        video: "https://www.youtube.com/embed/zzfQwXEqYaI",
+        song: "Somebody to Love",
+        singer: "Finn"
+    },
+    {
+        video: "https://www.youtube.com/embed/7xq4yF2Yf2Q",
+        song: "Halo",
+        singer: "Rachel"
+    },
+    {
+        video: "https://www.youtube.com/embed/NT9YdCwXyYg",
+        song: "Smooth Criminal",
+        singer: "Santana"
+    }
+];
+
+let currentRound = 0;
+let timer = 10;
+let countdown;
+let scores = [0, 0];
+
+function startRound() {
+    if (currentRound >= rounds.length) {
+        endGame();
+        return;
+    }
+
+    document.getElementById("video").src = rounds[currentRound].video;
+    document.getElementById("round").innerText =
+        "Round " + (currentRound + 1) + " / 8";
+
+    timer = 10;
+    document.getElementById("timer").innerText = "Time: " + timer;
+
+    clearInterval(countdown);
+    countdown = setInterval(() => {
+        timer--;
+        document.getElementById("timer").innerText = "Time: " + timer;
+
+        if (timer <= 0) {
+            clearInterval(countdown);
+            submitAnswers();
+        }
+    }, 1000);
+
+    clearInputs();
+}
+
+function clearInputs() {
+    document.getElementById("p1song").value = "";
+    document.getElementById("p1artist").value = "";
+    document.getElementById("p2song").value = "";
+    document.getElementById("p2artist").value = "";
+    document.getElementById("result").innerText = "";
+}
+
+function submitAnswers() {
+    clearInterval(countdown);
+
+    const round = rounds[currentRound];
+
+    checkPlayer(0, "p1song", "p1artist");
+    checkPlayer(1, "p2song", "p2artist");
+
+    document.getElementById("scores").innerText =
+        "Player 1: " + scores[0] + " | Player 2: " + scores[1];
+
+    currentRound++;
+
+    setTimeout(startRound, 3000);
+}
+
+function checkPlayer(playerIndex, songId, artistId) {
+    const songGuess = document.getElementById(songId).value.toLowerCase();
+    const artistGuess = document.getElementById(artistId).value.toLowerCase();
+
+    let points = 0;
+
+    if (songGuess.includes(rounds[currentRound].song.toLowerCase())) {
+        points++;
+    }
+
+    if (artistGuess.includes(rounds[currentRound].singer.toLowerCase())) {
+        points++;
+    }
+
+    scores[playerIndex] += points;
+}
+
+function endGame() {
+    document.getElementById("video").style.display = "none";
+
+    let winnerText;
+
+    if (scores[0] > scores[1]) {
+        winnerText = "🏆 Player 1 Wins!";
+    } else if (scores[1] > scores[0]) {
+        winnerText = "🏆 Player 2 Wins!";
+    } else {
+        winnerText = "🤝 It's a Tie!";
+    }
+
+    document.getElementById("result").innerHTML =
+        winnerText + "<br>Final Score: " + scores[0] + " - " + scores[1];
+}
+
+startRound();
+</script>
+
+</body>
+</html>
